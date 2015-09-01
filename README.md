@@ -1,6 +1,8 @@
 supervisord-slack-notifier
 ==========================
 
+[![Build Status](https://travis-ci.org/Schibsted-Tech-Polska/supervisord-slack-notifier.svg)](https://travis-ci.org/Schibsted-Tech-Polska/supervisord-slack-notifier)
+
 Event listener for Supervisord that sends notifications to Slack via Web API
 
 ## Package
