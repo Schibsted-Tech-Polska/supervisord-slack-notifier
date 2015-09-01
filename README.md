@@ -8,8 +8,8 @@ Event listener for Supervisord that sends notifications to Slack via Web API
 Basic structure of package is
 
 ```
---- packagename
-  \ packagename.py
+--- slackNotifier
+  \ slackNotifier.py
   \ version.py
 --- tests
   \ tests_helper.py
