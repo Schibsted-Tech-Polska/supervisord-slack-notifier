@@ -71,13 +71,12 @@ def usage():
 
 class Slack:
 
-    def __init__(self, slackClient, programs, any, channel, token):
+    def __init__(self, slackClient, programs, any, channel):
 
         self.slackClient = slackClient
         self.programs = programs
         self.any = any
         self.channel = channel
-        self.token = token
         self.stdin = sys.stdin
         self.stdout = sys.stdout
         self.stderr = sys.stderr
@@ -104,7 +103,6 @@ class Slack:
 
     def send(self, msg):
         self.slackClient.chat_post_message(self.channel, '', username='Supervisord', icon_emoji=':doge:', attachments='[{"text": "' + msg +'", "color": "warning", "mrkdwn_in": ["text"]}]')
-        self.stderr.write('sent: ' + msg + ' to: ' + self.channel + ' token: ' + self.token)
 
 def main(argv=sys.argv):
     import getopt
@@ -153,7 +151,7 @@ def main(argv=sys.argv):
     sys.stderr.flush()
     slackClient = SlackClient(token)
 
-    prog = Slack(slackClient, programs, any, channel, token)
+    prog = Slack(slackClient, programs, any, channel)
     prog.runforever()
 
 
