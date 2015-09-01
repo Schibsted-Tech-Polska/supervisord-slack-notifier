@@ -20,7 +20,7 @@
 # A supervisor config snippet that tells supervisor to use this script
 # as a listener is below.
 #
-# [eventlistener:slack]
+# [eventlistener:slackNotifier]
 # command =
 #     ./slack
 #         -t=token
@@ -28,7 +28,7 @@
 # events=PROCESS_STATE
 
 doc = """\
-slack.py [-p processname] [-a] [-c channel] -t token
+slackNotifier.py [-p processname] [-a] [-c channel] -t token
 
 Options:
 
@@ -52,7 +52,7 @@ selection of -p.
 
 A sample invocation:
 
-slack.py -p=program1 -p=group1:program2 -t=dckjhgvfuhvdf -c='#general'
+slackNotifier.py -p=program1 -p=group1:program2 -t=dckjhgvfuhvdf -c='#general'
 
 """
 
@@ -69,7 +69,7 @@ def usage():
     sys.exit(255)
 
 
-class Slack:
+class SlackNotifier:
 
     def __init__(self, slackClient, programs, any, channel):
 
@@ -151,7 +151,7 @@ def main(argv=sys.argv):
     sys.stderr.flush()
     slackClient = SlackClient(token)
 
-    prog = Slack(slackClient, programs, any, channel)
+    prog = SlackNotifier(slackClient, programs, any, channel)
     prog.runforever()
 
 
