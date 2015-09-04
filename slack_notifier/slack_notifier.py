@@ -20,15 +20,15 @@
 # A supervisor config snippet that tells supervisor to use this script
 # as a listener is below.
 #
-# [eventlistener:slackNotifier]
+# [eventlistener:slack_notifier]
 # command =
-#     ./slack
+#     ./slack_notifier
 #         -t=token
 #         -c=channel
 # events=PROCESS_STATE
 
 doc = """\
-slackNotifier.py [-p processname] [-a] [-c channel] -t token
+slack_notifier.py [-p processname] [-a] [-c channel] -t token
 
 Options:
 
@@ -52,7 +52,7 @@ selection of -p.
 
 A sample invocation:
 
-slackNotifier.py -p=program1 -p=group1:program2 -t=dckjhgvfuhvdf -c='#general'
+slack_notifier.py -p=program1 -p=group1:program2 -t=dckjhgvfuhvdf -c='#general'
 
 """
 

@@ -9,7 +9,7 @@ setuptools.setup(name='slackNotifier',
                  author='Wojciech Iskra',
                  author_email='wojciech.iskra@schibsted.pl',
                  url='https://github.com/Schibsted-Tech-Polska/supervisord-slack-notifier',
-                 py_modules=['slackNotifier'],
+                 py_modules=['slack_notifier'],
                  install_requires=[
                      'supervisor',
                      'pyslack-real==0.5.3',

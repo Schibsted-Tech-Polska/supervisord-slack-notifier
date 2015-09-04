@@ -1,4 +1,4 @@
-from slackNotifier.version import Version
+from slack_notifier.version import Version
 from tests import *
 from tests.helpers import *
 
