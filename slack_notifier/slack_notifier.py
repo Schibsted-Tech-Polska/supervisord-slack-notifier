@@ -60,6 +60,8 @@ import config
 import os
 import sys
 import socket
+import json
+import datetime
 
 from pprint import pprint
 from pyslack import SlackClient
@@ -110,7 +112,7 @@ class SlackNotifier:
                     break
                 continue
 
-            msg = '*[' + socket.gethostname() + ']*\n process *' +\
+            msg = 'Process *' +\
                 pheaders['groupname'] + ':' + pheaders['processname'] +\
                 '* went from *' + pheaders['from_state'] +\
                 '* to *' + headers['eventname'] + '*'
@@ -125,7 +127,31 @@ class SlackNotifier:
                 break
 
     def send(self, eventName, msg):
-        self.slackClient.chat_post_message(self.channel, '', username='Supervisord', icon_emoji=':doge:', attachments='[{"text": "' + msg + ' ' + config.eventMap[eventName]['emoji'] + '", "color": "' + config.eventMap[eventName]['color'] + '", "mrkdwn_in": ["text"]}]')
+        attachments = [{
+            'text': msg + ' ' + config.events[eventName]['emoji'],
+            'color': config.events[eventName]['color'],
+            'mrkdwn_in': ['text'],
+            'fields': [
+                {
+                    'title': 'Server',
+                    'value': socket.gethostname(),
+                    'short': True
+                },
+                {
+                    'title': 'Date',
+                    'value': datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+                    'short': True
+                }
+            ],
+        }]
+
+        self.slackClient.chat_post_message(
+            self.channel,
+            '',
+            username='Supervisord',
+            icon_emoji=':doge:',
+            attachments=json.dumps(attachments)
+            )
 
 
 def main(argv=sys.argv):
@@ -146,7 +172,7 @@ def main(argv=sys.argv):
         usage()
 
     programs = []
-    events = config.events
+    events = config.events.keys()
     any = False
     channel = ''
     token = ''
