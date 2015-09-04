@@ -56,10 +56,12 @@ slack_notifier.py -p=program1 -p=group1:program2 -t=dckjhgvfuhvdf -c='#general'
 
 """
 
+import config
 import os
 import sys
 import socket
 
+from pprint import pprint
 from pyslack import SlackClient
 from supervisor import childutils
 
@@ -71,10 +73,11 @@ def usage():
 
 class SlackNotifier:
 
-    def __init__(self, slackClient, programs, any, channel):
+    def __init__(self, slackClient, programs, any, events, channel):
 
         self.slackClient = slackClient
         self.programs = programs
+        self.events = events
         self.any = any
         self.channel = channel
         self.stdin = sys.stdin
@@ -83,33 +86,55 @@ class SlackNotifier:
 
     def runforever(self, test=False):
         while 1:
-            # we explicitly use self.stdin, self.stdout, and self.stderr
+            # we explicitly use self.stdin, self.stderr, and self.stderr
             # instead of sys.* so we can unit test this code
             headers, payload = childutils.listener.wait(
                 self.stdin, self.stdout)
 
             pheaders, pdata = childutils.eventdata(payload+'\n')
 
-            msg = socket.gethostname() + ': process *' + pheaders['groupname'] + ':' + pheaders['processname'] + '* changed status from *' + pheaders['from_state'] + '* to *' + headers['eventname'] +'*'
+            if not headers['eventname'] in self.events:
+                # do nothing with non-TICK events
+                childutils.listener.ok(self.stdout)
+                if test:
+                    self.stderr.write(pheaders['from_state'] + ' --> ' + headers['eventname'] + ': non-exited event\n')
+                    self.stderr.flush()
+                    break
+                continue
 
-            self.stderr.write('unexpected exit, sending notification\n')
+            if not self.any and not pheaders['processname'] in self.programs:
+                childutils.listener.ok(self.stdout)
+                if test:
+                    self.stderr.write('not followed program event\n')
+                    self.stderr.flush()
+                    break
+                continue
+
+            msg = '*[' + socket.gethostname() + ']*\n process *' +\
+                pheaders['groupname'] + ':' + pheaders['processname'] +\
+                '* went from *' + pheaders['from_state'] +\
+                '* to *' + headers['eventname'] + '*'
+
+            self.stderr.write('sending notification:' + msg + '\n')
             self.stderr.flush()
 
-            self.send(msg)
+            self.send(headers['eventname'], msg)
 
             childutils.listener.ok(self.stdout)
             if test:
                 break
 
-    def send(self, msg):
-        self.slackClient.chat_post_message(self.channel, '', username='Supervisord', icon_emoji=':doge:', attachments='[{"text": "' + msg +'", "color": "warning", "mrkdwn_in": ["text"]}]')
+    def send(self, eventName, msg):
+        self.slackClient.chat_post_message(self.channel, '', username='Supervisord', icon_emoji=':doge:', attachments='[{"text": "' + msg + ' ' + config.eventMap[eventName]['emoji'] + '", "color": "' + config.eventMap[eventName]['color'] + '", "mrkdwn_in": ["text"]}]')
+
 
 def main(argv=sys.argv):
     import getopt
-    short_args = "hp:at:c:"
+    short_args = "hp:e:at:c:"
     long_args = [
         "help",
         "program=",
+        "event=",
         "any",
         "token="
         "channel=",
@@ -121,8 +146,9 @@ def main(argv=sys.argv):
         usage()
 
     programs = []
-    any = True
-    channel = '#vg-platform-team'
+    events = config.events
+    any = False
+    channel = ''
     token = ''
 
     for option, value in opts:
@@ -133,6 +159,9 @@ def main(argv=sys.argv):
         if option in ('-p', '--program'):
             programs.append(value)
 
+        if option in ('-e', '--event'):
+            events.append(value)
+
         if option in ('-a', '--any'):
             any = True
 
@@ -142,7 +171,7 @@ def main(argv=sys.argv):
         if option in ('-c', '--channel'):
             channel = value
 
-    if not 'SUPERVISOR_SERVER_URL' in os.environ:
+    if 'SUPERVISOR_SERVER_URL' not in os.environ:
         sys.stderr.write('slack must be run as a supervisor event '
                          'listener\n')
         sys.stderr.flush()
@@ -151,7 +180,7 @@ def main(argv=sys.argv):
     sys.stderr.flush()
     slackClient = SlackClient(token)
 
-    prog = SlackNotifier(slackClient, programs, any, channel)
+    prog = SlackNotifier(slackClient, programs, any, events, channel)
     prog.runforever()
 
 
