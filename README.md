@@ -33,8 +33,8 @@ and python 3.2, should you choose to use it.
 ## Configuration
 Add to supervisord.conf the following:
 ```
-[eventlistener:slackNotifier]
-command=/usr/bin/slackNotifier -t=%AUTH_TOKEN% -c=%CHANNEL_NAME%
+[eventlistener:slack_notifier]
+command=/usr/bin/slack_notifier -t=%AUTH_TOKEN% -c=%CHANNEL_NAME%
 events=PROCESS_STATE
 ```
 

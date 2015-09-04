@@ -1,8 +1,8 @@
 import setuptools
-from slackNotifier.version import Version
+from slack_notifier.version import Version
 
 
-setuptools.setup(name='slackNotifier',
+setuptools.setup(name='slack_notifier',
                  version=Version('1.0.0').number,
                  description='Supervisord Slack Notifier',
                  long_description=open('README.md').read().strip(),
