@@ -30,13 +30,42 @@ To see an html output of coverage open ```htmlcov/index.html``` after running th
 There is a ```.travis.yml``` file that is set up to run your tests for python 2.7
 and python 3.2, should you choose to use it.
 
-## Configuration
+## Set up
+To get the package up and running run
+
+```
+./setup.py install
+```
+
 Add to supervisord.conf the following:
 ```
 [eventlistener:slack_notifier]
-command=/usr/bin/slack_notifier -t=%AUTH_TOKEN% -c=%CHANNEL_NAME%
+command=/path/to/slack_notifier -t=%AUTH_TOKEN% -c=%CHANNEL_NAME% -a
 events=PROCESS_STATE
 ```
+
+##Options
+
+-p -- specify a supervisor process_name. Notify when the process goes to any of the 'followed' states.
+    If this process is part of a group, it can be specified using the
+      'process_name:group_name' syntax.
+
+-a -- Notify about ALL processes.  Overrides any -p
+    parameters passed in the same crashmail process invocation.
+
+-e -- follow only transitions to these events. This overrides event list in config.py
+
+-c -- Channel to send notifications to. Can be either:
+    '#public_channel',
+    '@private_group',
+    'CHANNEL_ID',
+
+-t -- Web API auth token
+
+The -p and -e options may be specified more than once, allowing for
+specification of multiple processes and events.  Specifying -a overrides any
+selection of -p.
+
 
 ## License
 

@@ -32,22 +32,24 @@ slack_notifier.py [-p processname] [-a] [-c channel] -t token
 
 Options:
 
--p -- specify a supervisor process_name.  Send mail when this process
-      transitions to the EXITED state unexpectedly. If this process is
-      part of a group, it can be specified using the
+-p -- specify a supervisor process_name. Notify when the process goes to any of the 'followed' states.
+    If this process is part of a group, it can be specified using the
       'process_name:group_name' syntax.
 
--a -- Send mail when any child of the supervisord transitions
-    unexpectedly to the EXITED state unexpectedly.  Overrides any -p
+-a -- Notify about ALL processes.  Overrides any -p
     parameters passed in the same crashmail process invocation.
 
+-e -- follow only transitions to these events. This overrides event list in config.py
 
--c -- Channel to send notifications to
+-c -- Channel to send notifications to. Can be either:
+    '#public_channel',
+    '@private_group',
+    'CHANNEL_ID',
 
 -t -- Web API auth token
 
-The -p option may be specified more than once, allowing for
-specification of multiple processes.  Specifying -a overrides any
+The -p and -e options may be specified more than once, allowing for
+specification of multiple processes and events.  Specifying -a overrides any
 selection of -p.
 
 A sample invocation:
@@ -172,7 +174,7 @@ def main(argv=sys.argv):
         usage()
 
     programs = []
-    events = config.events.keys()
+    events = []
     any = False
     channel = ''
     token = ''
@@ -196,6 +198,9 @@ def main(argv=sys.argv):
 
         if option in ('-c', '--channel'):
             channel = value
+
+    if not events:
+        events = config.events.keys()
 
     if 'SUPERVISOR_SERVER_URL' not in os.environ:
         sys.stderr.write('slack must be run as a supervisor event '
