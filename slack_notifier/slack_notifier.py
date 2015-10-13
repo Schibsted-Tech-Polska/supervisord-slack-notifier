@@ -119,9 +119,6 @@ class SlackNotifier:
                 '* went from *' + pheaders['from_state'] +\
                 '* to *' + headers['eventname'] + '*'
 
-            self.stderr.write('sending notification:' + msg + '\n')
-            self.stderr.flush()
-
             self.send(headers['eventname'], msg)
 
             childutils.listener.ok(self.stdout)
