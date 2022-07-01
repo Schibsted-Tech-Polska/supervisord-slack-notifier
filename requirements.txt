@@ -1,4 +1,4 @@
 pyslack-real==0.5.3
 pytest==2.7.1
 pytest-cov==1.8.1
-supervisor==3.1.3
+supervisor==3.1.4
