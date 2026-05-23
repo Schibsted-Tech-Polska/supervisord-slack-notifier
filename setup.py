@@ -15,7 +15,7 @@ setuptools.setup(name='slack_notifier',
                      'pyslack-real==0.5.3',
                  ],
                  tests_require=[
-                     'pytest==2.7.1',
+                     'pytest==9.0.3',
                      'pytest-cov==1.8.1',
                  ],
                  license='MIT License',
